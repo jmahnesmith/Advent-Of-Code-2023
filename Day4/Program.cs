@@ -1,4 +1,7 @@
-﻿
+﻿// Solution for Day 4 part 1: 24733
+// Solution for Day 4 part 2: 5422730
+
+
 // Read the file and convert it into a list;
 var filePath = "resources/input.txt";
 var lines = await File.ReadAllLinesAsync(filePath);
@@ -11,7 +14,6 @@ Console.WriteLine($"Total Calculated points for all cards: {game.CalculatePoints
 public class Game
 {
     public List<Card> Cards { get; private set; }
-
     public Game()
     {
         Cards = new List<Card>();
@@ -41,6 +43,7 @@ public class Game
         }
     }
 
+    // Calculates points specified in part 1
     public int CalculatePoints()
     {
         var points = 0;
@@ -70,16 +73,55 @@ public class Game
 
         return points;
     }
+
+    // Calculates the total number of scratchcards including copies in part 2
+    public int CalculateTotalScratchcards()
+    {
+        // Initialize the counts array
+        var counts = Cards.Select(_ => 1).ToArray();
+
+        // Iterate over each card in the Cards list
+        for (var i = 0; i < Cards.Count; i++)
+        {
+            // Retrieve the current card
+            var card = Cards[i];
+
+            // For each match that the current card has...
+            for (var j = 0; j < card.Matches; j++)
+            {
+                // Check if the subsequent card index is within bounds
+                if (i + j + 1 < Cards.Count)
+                {
+                    // Add the count of the current card to the subsequent card's count
+                    counts[i + j + 1] += counts[i];
+                }
+            }
+        }
+
+        // Return the sum of all counts
+        return counts.Sum();
+    }
+
 }
 
 public class Card
 {
     public Card(int cardNumber, List<int> winningNumbers, List<int> cardNumbers)
     {
+        CardNumber = cardNumber;
         WinningNumbers = winningNumbers;
         CardNumbers = cardNumbers;
     }
 
+    public int CardNumber { get; }
+
+    public int Matches
+    {
+        get
+        {
+            return WinningNumbers.Intersect(CardNumbers).Count();
+        }
+    }
     public List<int> WinningNumbers { get; }
     public List<int> CardNumbers { get; }
 }
