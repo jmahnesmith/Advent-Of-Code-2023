@@ -2,7 +2,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build",
+            "label": "build Day 1",
             "command": "dotnet",
             "type": "process",
             "args": [
@@ -10,6 +10,36 @@
                 "${workspaceFolder}/Day1/day1.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build Day 2",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/Day2/Day2.csproj",
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build Day 3",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/Day3/Day3.csproj",
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build Day 4",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/Day4/Day4.csproj",
             ],
             "problemMatcher": "$msCompile"
         },

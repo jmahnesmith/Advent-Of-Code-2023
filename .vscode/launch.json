@@ -2,10 +2,21 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Launch Day 4",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build Day 4",
+            "program": "${workspaceFolder}/Day4/bin/Debug/net6.0/Day4.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Day4",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        },
+        {
             "name": "Launch Day 3",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "build Day 3",
             "program": "${workspaceFolder}/Day3/bin/Debug/net6.0/Day3.dll",
             "args": [],
             "cwd": "${workspaceFolder}/Day3",
@@ -16,7 +27,7 @@
             "name": "Launch Day 2",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "build Day 2",
             "program": "${workspaceFolder}/Day2/bin/Debug/net6.0/Day2.dll",
             "args": [],
             "cwd": "${workspaceFolder}/Day2",
@@ -30,7 +41,7 @@
             "name": "Launch Day 1",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "build Day 1",
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/Day1/bin/Debug/net6.0/day1.dll",
             "args": [],
