@@ -2,6 +2,17 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Launch Day 5",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build Day 5",
+            "program": "${workspaceFolder}/Day5/bin/Debug/net6.0/Day5.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Day5",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        },
+        {
             "name": "Launch Day 4",
             "type": "coreclr",
             "request": "launch",
