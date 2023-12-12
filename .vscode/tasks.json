@@ -64,6 +64,16 @@
             "problemMatcher": "$msCompile"
         },
         {
+            "label": "build Day 7",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/Day7/Day7.csproj",
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
             "label": "publish",
             "command": "dotnet",
             "type": "process",
