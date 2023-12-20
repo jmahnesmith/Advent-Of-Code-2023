@@ -1,130 +1,88 @@
 ﻿// Day 8 Part 1 answer: 18673
+// Day 8 Part 2 answer: 17972669116327
 
-var input = File.ReadAllLines("resources/input.txt").ToList();
-var network = ParseInput(input);
+// Holds the mappings for each node.
+Dictionary<string, (string left, string right)> _mappings = new();
 
-var part1HopCount = network.SolvePart1("ZZZ");
-Console.WriteLine($"Part1 Hop Count: {part1HopCount}");
+// Read the mappings and directions, then calculate and display results.
+ReadMappingsFromFile("resources/input.txt");
+var directions = File.ReadAllLines("resources/input.txt").FirstOrDefault();
+Console.WriteLine($"Solution 1 Steps: {CalculateStepsToTarget("AAA", "ZZZ", directions)}");
+Console.WriteLine($"Solution 2 LCM: {CalculateLcmForAllAEndings(directions)}");
 
-
-var part2HopCount = network.SolvePart2();
-Console.WriteLine($"Part2 Hop Count: {part2HopCount}");
-
-Network ParseInput(List<string> input)
+// Reads node mappings from a file and stores them in the dictionary.
+void ReadMappingsFromFile(string filePath)
 {
-    ArgumentNullException.ThrowIfNull(input);
-
-    var directions = input.FirstOrDefault().ToCharArray();
-
-    var start = "AAA";
-
-    /*input.Skip(1)
-        .Where(x => !string.IsNullOrEmpty(x))
-        .Select(x => x.Split(new char[] { '(', ',', ')' }, StringSplitOptions.RemoveEmptyEntries)[0].Trim())
-        .FirstOrDefault().Replace("=", "").Trim();*/
-
-    var map = input.Skip(1)
-    .Where(x => !string.IsNullOrEmpty(x))
-    .SelectMany(x =>
+    try
     {
-        string[] parts = x.Split(new char[] { '(', ',', ')' }, StringSplitOptions.RemoveEmptyEntries);
-        return new Dictionary<string, (string Left, string Right)>
-        {
-            {parts[0].Replace("=", "").Trim(), (parts[1].Trim(), parts[2].Trim())}
-        };
-    }).ToDictionary(kv => kv.Key, kv => kv.Value);
+        string[] lines = File.ReadAllLines(filePath);
+        var splitter = new[] { " ", "\t", "=", ",", "(", ")" };
 
-    return new Network(map, directions, start);
+        foreach (var line in lines.Skip(2))
+        {
+            var split = line.Split(splitter, StringSplitOptions.RemoveEmptyEntries);
+            _mappings.Add(split[0], (split[1], split[2]));
+        }
+    }
+    catch (IOException ex)
+    {
+        Console.WriteLine($"Error reading file: {ex.Message}");
+    }
 }
 
-public class Network
+// Calculates the number of steps to traverse from a start node to a target node following given directions.
+int CalculateStepsToTarget(string startNode, string targetNode, string directions)
 {
-    public string Start { get; private set; }
-    public Dictionary<string, (string Left, string Right)> Map { get; private set; }
-    public char[] Directions { get; private set; }
+    bool endFound = false;
+    int steps = 0;
+    var currNode = startNode;
 
-    public Network(Dictionary<string, (string Left, string Right)> map, char[] directions, string start)
+    while (!endFound)
     {
-        Map = map;
-        Directions = directions;
-        Start = start;
+        var dir = directions[steps % directions.Length];
+        currNode = NextNode(currNode, dir);
+        endFound = currNode == targetNode;
+        steps++;
     }
 
-    public int SolvePart1(string destination)
-    {
-        var currentLocation = Start;
-        // Initialize the hop counter
-        var hopCount = 0;
-
-        for (int i = 0; i < Directions.Length; i++)
-        {
-            var options = Map[currentLocation];
-            switch (Directions[i])
-            {
-                case 'R':
-                    currentLocation = options.Right;
-                    break;
-                case 'L':
-                    currentLocation = options.Left;
-                    break;
-            }
-
-            // Increment hop count at each move
-            hopCount++;
-
-            if (currentLocation == destination)
-            {
-                return hopCount;
-            }
-            // Check if index has reached the last element if so reset loop.
-            if (i == Directions.Length - 1)
-            {
-                // Reset to -1 as it will be incremented to 0 at the end of the loop
-                i = -1;
-            }
-        }
-
-
-        return hopCount;
-    }
-
-    private List<string> FindPath(string start, Func<(string Left, string Right), bool> condition)
-    {
-        var path = new List<string>();
-        var current = Map[start];
-        var lrCnt = 0;
-
-        while (!condition(current))
-        {
-            path.Add(start);
-            start = Directions[lrCnt % Directions.Length] == 'L' ? current.Left : current.Right;
-            current = Map[start];
-            lrCnt++;
-        }
-
-        return path;
-    }
-
-    private long GreatestCommonDivisor(long a, long b)
-    {
-        while (b != 0)
-        {
-            a %= b;
-            (a, b) = (b, a);
-        }
-        return a;
-    }
-
-    private long FindLeastCommonMultiple(IEnumerable<long> numbers) =>
-        numbers.Aggregate((long)1, (current, number) => current / GreatestCommonDivisor(current, number) * number);
-
-    public long SolvePart2()
-    {
-        var pathLengths = Map.Keys.Where(key => key.EndsWith("A"))
-                                  .Select(start => FindPath(start, node => node.Right.EndsWith("Z") || node.Left.EndsWith("Z")))
-                                  .Select(path => (long)path.Count);
-
-        return FindLeastCommonMultiple(pathLengths);
-    }
-
+    return steps;
 }
+
+// Returns the next node based on the current node and the direction.
+string NextNode(string currentNode, char direction)
+{
+    return direction == 'L' ? _mappings[currentNode].left : _mappings[currentNode].right;
+}
+
+// Calculates the Least Common Multiple (LCM) of the steps required for all nodes ending with 'A' to reach their respective 'Z' nodes.
+long CalculateLcmForAllAEndings(string directions)
+{
+    var currNodes = _mappings.Keys.Where(key => key.EndsWith("A")).ToList();
+    long[] values = new long[currNodes.Count];
+
+    for (int nodeInd = 0; nodeInd < currNodes.Count; nodeInd++)
+    {
+        bool endFound = false;
+        int i = 0;
+
+        while (!endFound)
+        {
+            var dir = directions[i % directions.Length];
+            currNodes[nodeInd] = NextNode(currNodes[nodeInd], dir);
+
+            if (currNodes[nodeInd].EndsWith("Z"))
+                endFound = true;
+            i++;
+        }
+
+        values[nodeInd] = i;
+    }
+
+    return Lcm(values);
+}
+
+// Helper method to compute the Greatest Common Divisor (GCD) of two numbers.
+static long Gcd(long a, long b) => b == 0 ? a : Gcd(b, a % b);
+
+// Helper method to compute the Least Common Multiple (LCM) of an array of values.
+static long Lcm(long[] values) => values.Aggregate((a, b) => a * b / Gcd(a, b));
