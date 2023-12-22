@@ -1,4 +1,5 @@
 ﻿// Day 9 Part 1 Answer: 1882395907
+// Day 9 Part 2 Answer: 1005
 
 // Read all lines from the input file
 var input = File.ReadAllLines("resources/input.txt").ToList();
@@ -13,21 +14,28 @@ input.ForEach(line =>
 });
 
 // Calculate the sum of predicted values from all pyramids
-long part1Answer = pyramids.Sum(pyramid => pyramid.GetPredictedValue());
+long part1Answer = pyramids.Sum(pyramid => pyramid.GetFuturePredictedValue());
 
 // Output the result
 Console.WriteLine($"Part 1 answer: {part1Answer}");
+
+// Calculate the sum of predicted values from all pyramids
+long part2Answer = pyramids.Sum(pyramid => pyramid.GetPastPredictedValue());
+
+// Output the result
+Console.WriteLine($"Part 2 answer: {part2Answer}");
 
 class Pyramid
 {
     public List<List<long>> Levels { get; private set; }
 
-    // Constructor: Initializes the pyramid with the top level and generates the full pyramid
+    // Initializes the pyramid with the top level and generates the full pyramid
     public Pyramid(IEnumerable<long> topLevel)
     {
         Levels = new List<List<long>> { topLevel.ToList() };
         GeneratePyramid();
-        SetPredictedValues();
+        SetFuturePredictedValues();
+        SetPastPredictedValues();
     }
 
     // Generates the entire pyramid levels
@@ -62,7 +70,7 @@ class Pyramid
     }
 
     // Sets predicted values for each level in the pyramid
-    private void SetPredictedValues()
+    private void SetFuturePredictedValues()
     {
         // Add 0 to the last level as a starting point
         Levels.Last().Add(0);
@@ -79,9 +87,32 @@ class Pyramid
         }
     }
 
-    // Retrieves the predicted value from the top level of the pyramid
-    public long GetPredictedValue()
+    private void SetPastPredictedValues()
+    {
+        // Add 0 to the last level as a starting point
+        Levels[Levels.Count - 1] = new List<long> { 0 }.Concat(Levels.Last()).ToList();
+
+        // Work our way up the pyramid, setting predicted values
+        for (int level = Levels.Count - 1; level >= 0; level--)
+        {
+            // Ensure we're within range before calculating the next value
+            if (level + 1 < Levels.Count)
+            {
+                long prevValue = Levels[level][0] - Levels[level + 1][0];
+                Levels[level] = new List<long> { prevValue }.Concat(Levels[level]).ToList();
+            }
+        }
+    }
+
+    // Retrieves the future predicted value from the top level of the pyramid
+    public long GetFuturePredictedValue()
     {
         return Levels.First().Last();
+    }
+
+    // Retrieves the past predicted value from the top level of the pyramid
+    public long GetPastPredictedValue()
+    {
+        return Levels.First().First();
     }
 }
